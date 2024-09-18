@@ -64,6 +64,7 @@
                 :src="photo.url"
                 :alt="index"
               >
+              <input type="button" class="detail-show-photo-button" @click="openModal_photo(photo.url)">
             </figure>
           </div>
         </div>
@@ -161,6 +162,7 @@
                   :src="roleImpression.photos[0].url"
                   :alt="roleImpression.role"
                 >
+                <input type="button" class="detail-show-photo-button" @click="openModal_photo(roleImpression.photos[0].url)">
               </figure>
             </div>
           </div>
@@ -189,11 +191,13 @@
         </div>        
       </div>
     </div>
+    <photoDialog :postURL="dialog_url" v-show="showContent_photo" @close="closeModal_photo"/>
   </div>
 </template>
 
 <script>
 import { OK, UNPROCESSABLE_ENTITY } from '../util'
+import photoDialog from '../components/Photo_Dialog.vue'
 
 export default {
   props: {
@@ -201,6 +205,10 @@ export default {
       type: String,
       required: true
     }
+  },
+  // このページの上で表示するコンポーネント
+  components: {
+    photoDialog
   },
   // データ
   data() {
@@ -210,7 +218,11 @@ export default {
       // 元データ
       originalDVD: {},
       // 貸出可否
-      rentFlag: 0,      
+      rentFlag: 0,
+
+      // photo
+      showContent_photo: false,
+      dialog_url: '',  
       
       // 都道府県
       optionPrefectures : [
@@ -328,9 +340,17 @@ export default {
       this.originalDVD = JSON.parse(JSON.stringify(this.DVD));
       if(this.originalDVD.rents) {
         this.rentFlag = this.DVD.rents.find(rent => rent.flag == 1);
-      }
+      }     
+    },
 
-     
+    // 写真拡大
+    openModal_photo(url) {
+      this.showContent_photo = true;
+      this.dialog_url = url;
+    },
+    closeModal_photo() {
+      this.showContent_photo = false;
+      this.dialog_url = '';
     }
   }
 }
