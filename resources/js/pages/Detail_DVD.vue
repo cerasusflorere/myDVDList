@@ -15,12 +15,6 @@
           </div>
 
           <div class="detail-show-info-block">
-            <div class="detail-show-info-header">公式:</div>
-            <div class="detail-show-info-header" v-if="DVD.official"><i class="fas fa-check fa-fw"></i></div>
-            <div class="detail-show-info-header" v-else><i class="fas fa-times"></i></div>
-          </div>
-
-          <div class="detail-show-info-block">
             <div class="detail-show-info-header">媒体:</div>
             <div class="detail-show-info-header" v-if="DVD.format == 1">DVD</div>
             <div class="detail-show-info-header" v-else>Bluray</div>
@@ -50,6 +44,13 @@
           <div class="detail-show-info-block">
             <div class="detail-show-info-header">ゲキ×シネ:</div>
             <a :href="DVD.url_movie" class="detail-show-info-header" target="_blank" rel="noopener noreferrer">{{ DVD.url_movie }}</a>
+          </div>
+        </div>
+
+        <div class="detail-show-info-line" v-if="DVD.url_youtube">
+          <div class="detail-show-info-block">
+            <div class="detail-show-info-header">映像:</div>
+            <a :href="DVD.url_youtube" class="detail-show-info-header" target="_blank" rel="noopener noreferrer">{{ DVD.url_youtube }}</a>
           </div>
         </div>
       </div>
@@ -90,7 +91,7 @@
               (@{{ optionPrefectures[optionPrefectures.findIndex(({value}) => value == location.prefecture)].title }})
             </div>
           </div>
-        </div>       
+        </div>
       </div>
 
       <!-- 戯曲 -->
@@ -100,9 +101,13 @@
       </div>
 
       <!-- 衣装 -->
-      <div class="detail-show-author-area" v-if="DVD.costumer">
+      <div class="detail-show-author-area" v-if="DVD.costumers.length">
         <div class="detail-show-header">衣装</div>
-        <div class="detail-show-author">{{ DVD.costumer }}</div>
+        <div class="detail-show-costumers-block">
+          <div class="detail-show-costumer-area" v-for="costumer in DVD.costumers">
+            <div class="detail-show-author">{{ costumer.name }}</div>
+          </div>
+        </div>
       </div>
 
       <!-- 作詞 -->
@@ -115,6 +120,12 @@
       <div class="detail-show-author-area" v-if="DVD.choreo">
         <div class="detail-show-header">振付</div>
         <div class="detail-show-author">{{ DVD.choreo }}</div>
+      </div>
+
+      <!-- ゲキ×シネ監督 -->
+      <div class="detail-show-author-area" v-if="DVD.director">
+        <div class="detail-show-header">ゲキ×シネ監督</div>
+        <div class="detail-show-author">{{ DVD.director }}</div>
       </div>
 
       <!-- あらすじ -->
@@ -141,12 +152,6 @@
         <div class="detail-show-impression">{{ DVD.impression }}</div>
       </div>
 
-      <!-- 歴史 -->
-      <div class="detail-show-history-area" v-if="DVD.history">
-        <div class="detail-show-header">歴史</div>
-        <div class="detail-show-history">{{ DVD.history }}</div>
-      </div>
-
       <!-- 役感想 -->
       <div class="detail-show-role-impressions-area" v-if="DVD.roleImpressionList.length">
         <div class="detail-show-role-impression-block" v-for="roleImpression in DVD.roleImpressionList">
@@ -169,13 +174,52 @@
         </div>
       </div>
 
+      <!-- 歴史 -->
+      <div class="detail-show-others-area" v-if="DVD.histories.length">
+        <div class="detail-show-header">歴史</div>
+        <div class="detail-show-others-block">
+          <div v-for="history in DVD.histories" class="detail-show-other-area">
+            <div class="detail-show-header" v-if="history.title">{{ history.title }}</div>
+            <div class="detail-show-other-area">{{ history.history }}</div>
+          </div>
+        </div>
+      </div>
+
       <!-- 歌 -->
-      <div class="detail-show-songs-area" v-if="DVD.songs.length">
+      <div class="detail-show-others-area" v-if="DVD.songs.length">
         <div class="detail-show-header">歌</div>
-        <div class="detail-show-songs-block">
-          <div v-for="song in DVD.songs" class="detail-show-other-area">
-            <div class="detail-show-song-title">{{ song.title }}</div>
-            <div class="detail-show-song-impression">{{ song.impression }}</div>
+        <div class="detail-show-others-block">
+          <div v-for="song in DVD.songs" class="detail-show-song-area">
+            <div class="detail-show-singer-common detail-show-singer-2">
+              <div class="detail-show-singer-common">
+                【
+              </div>
+              <div class="detail-show-singer-common detail-show-singer-5">
+                <div class="detail-show-singer-common detail-show-singer-2">
+                  {{ song.title }}
+                  <div v-if="song.singers.length" class="detail-show-singer-common">/</div>
+                </div>
+
+                <div v-if="song.singers.length" class="detail-show-singer-common">
+                  <div v-for="(singer, index) in song.singers" class="detail-show-singer-common">
+                    <div v-if="singer.role_id" class="detail-show-singer-common detail-show-singer-2">
+                      {{ singer.role.role }}
+                      <div class="detail-show-singer-small">
+                        (by {{ singer.role.player }})
+                      </div>
+                    </div>
+                    <div v-else-if="singer.role_group_id">
+                      {{ singer.role_group.name }}
+                    </div>
+                    <div v-else>
+                      {{ singer.name }}
+                    </div>
+
+                    <div v-if="index !== song.singers.length - 1">・</div>
+                  </div>
+                </div>          
+              </div>】</div>
+            <div class="detail-show-song-impression" v-if="song.impression">{{ song.impression }}</div>
           </div>
         </div>
       </div>
@@ -185,12 +229,14 @@
         <div class="detail-show-header">その他</div>
         <div class="detail-show-others-block">
           <div v-for="other in DVD.others" class="detail-show-other-area">
-            <div class="detail-show-header">{{ other.title }}</div>
-            <div class="detail-show-other-area">{{ other.impression }}</div>
+            <div class="detail-show-header" v-if="other.title">{{ other.title }}</div>
+            <div class="detail-show-other-area" v-if="other.impression">{{ other.impression }}</div>
           </div>
         </div>        
       </div>
+
     </div>
+
     <photoDialog :postURL="dialog_url" v-show="showContent_photo" @close="closeModal_photo"/>
   </div>
 </template>
@@ -218,12 +264,20 @@ export default {
       // 元データ
       originalDVD: {},
       // 貸出可否
-      rentFlag: 0,
-
+      rentFlag: 0,   
+      // エラー
+      errors: {
+        photo: {
+          roleImpression: null,
+          pres: null
+        },
+        error: null,
+      },
+      
       // photo
       showContent_photo: false,
-      dialog_url: '',  
-      
+      dialog_url: '',
+
       // 都道府県
       optionPrefectures : [
         { title:'北海道', value :1 },
@@ -293,18 +347,8 @@ export default {
       },
       immediate: true,
     }
-  },  
-  mounted() {
-    
-
   },
   methods: {
-    // ランダム文字列作成
-    getUniqueStr(){
-      const strong = 1000;
-      return new Date().getTime().toString(16)  + Math.floor(strong*Math.random()).toString(16)
-    },
-
     // DVDの詳細を取得
     async fetchDVD () {
       const response = await axios.get('/api/DVD/'+ this.propDVD);
@@ -331,16 +375,20 @@ export default {
         this.DVD.roleImpressionList = [];
       }
       this.DVD.locations.sort((a, b) => a.order - b.order );
+      this.DVD.costumers.sort((a, b) => a.order - b.order );
       this.DVD.roles.sort((a, b) => a.order - b.order );
       this.DVD.roleImpressionList.sort((a, b) => a.order - b.order);
       this.DVD.role_groups.sort((a, b) => a.order - b.order);
       this.DVD.songs.sort((a, b) => a.order - b.order);
+      this.DVD.songs.forEach((song) => {
+        song.singers.sort((a, b) => a.order - b.order);
+      });
       this.DVD.others.sort((a, b) => a.order - b.order);
 
       this.originalDVD = JSON.parse(JSON.stringify(this.DVD));
       if(this.originalDVD.rents) {
         this.rentFlag = this.DVD.rents.find(rent => rent.flag == 1);
-      }     
+      }
     },
 
     // 写真拡大

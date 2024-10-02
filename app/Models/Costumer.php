@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
-class Song extends Model
+class Costumer extends Model
 {
-    protected $table = 'song';
+    protected $table = 'costumer';
     
     /** 取得時にJSONに含める属性 */
     protected $visible = [
-        'id', 'DVD_id', 'order', 'title', 'impression', 'created_at', 'updated_at',
-        'singers'
+        'id', 'DVD_id', 'order', 'name',
+        'created_at', 'updated_at'
     ];
-    
+
     public function getCreatedAtAttribute()
     {
         return Carbon::parse($this->attributes['created_at'])->format('Y/m/d H:i:s');
@@ -33,15 +33,6 @@ class Song extends Model
     public function DVD_list()
     {
         return $this->belongsTo('App\Models\DVD_list', 'DVD_id');
-    }
-
-    /**
-     * リレーションシップ - singerテーブル
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function singers()
-    {
-        return $this->hasMany('App\Models\Singer');
     }
 }
 
