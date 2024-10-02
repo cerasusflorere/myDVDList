@@ -8,7 +8,10 @@ use App\Models\Role;
 use App\Models\Role_group;
 use App\Models\Role_photo;
 use App\Models\Location;
+use App\Models\Costumer;
+use App\Models\History;
 use App\Models\Song;
+use App\Models\Singer;
 use App\Models\Other;
 use App\Models\Photo;
 use Illuminate\Http\Request;
@@ -29,7 +32,7 @@ class DVDController extends BaseController
      */
     public function index()
     {
-        $DVDs = DVD_list::with(['locations','roles','photos','rents'=> function($query) {
+        $DVDs = DVD_list::with(['locations','costumers', 'roles','photos','rents'=> function($query) {
             $query->where('flag', 1);
         }])->orderByRaw('duration_from is null asc')->orderBy('duration_from')->get();
         return $DVDs;
@@ -44,10 +47,21 @@ class DVDController extends BaseController
     public function show($id)
     {
         $DVD = DVD_list::where('id', $id)
-              ->with(['locations', 'roles', 'roles.role_group:id,name', 'roles.role_photos', 'role_groups', 'songs', 'others', 'photos', 'rents'])->first();
+              ->with(['locations', 'costumers', 'roles', 'roles.role_group:id,name', 'roles.role_photos', 'role_groups', 'histories', 'songs', 'songs.singers', 'songs.singers.role', 'songs.singers.role_group', 'others', 'photos', 'rents'])->first();
         
 
         return $DVD ?? abort(404);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function theater()
+    {
+        $locations = Location::groupBy('theater')->get(['theater']);
+        return $locations;
     }
 
     /**
@@ -68,7 +82,7 @@ class DVDController extends BaseController
      */
     public function costumer()
     {
-        $costumers = DVD_list::groupBy('costumer')->get(['costumer']);
+        $costumers = Costumer::groupBy('name')->get(['name']);
         return $costumers;
     }
 
