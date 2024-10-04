@@ -3,6 +3,23 @@
     <div class="navbar__brand" @click="scrollTop">
       DVDリスト
     </div>
+    <div class="hamburger">
+      <!-- ここからハンバーガーメニュー -->
+      <div class="hamburger-menu">
+        <input type="checkbox" id="menu-btn-check"/>
+        <label for="menu-btn-check" class="menu-btn"><span></span></label>
+        <div class="menu-content">
+          <ul>
+            <li>
+              <RouterLink class="button" to="/" @click="closeMenu">
+                <i class="fas fa-list-ul fa-fw"></i>リスト
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+        <!-- ここまでハンバーガーメニュー -->
+      </div>
+    </div>
   </header>
 </template>
 
@@ -14,6 +31,10 @@ export default {
         top: 0,
         behavior: "smooth"
       });
+    },
+
+    closeMenu() {
+      document.getElementById('menu-btn-check').checked = false;
     }
   }
 }  
