@@ -160,15 +160,17 @@
               <div ref="detail_show_role_impression_headers">【{{ roleImpression.role }} <span><span class="detail-show-role-impression-detail-small">(by {{ roleImpression.player }})</span>】</span></div>
               <div class="detail-show-role-impression-detail-impression">{{ roleImpression.impression }}</div>
             </div>
-            <div class="detail-show-role-impression-photo">
-              <figure v-if="roleImpression.photos[0]" class="detail-show-role-impression-photo-wrapper">
-                <img
-                  class="detail-show-role-impression-photo-image"
-                  :src="roleImpression.photos[0].url"
-                  :alt="roleImpression.role"
-                >
-                <input type="button" class="detail-show-photo-button" @click="openModal_photo(roleImpression.photos[0].url)">
-              </figure>
+            <div v-if="roleImpression.photos" class="detail-show-role-impression-photo">
+              <div v-for="roleImpresionsPhoto in roleImpression.photos">
+                <figure v-if="roleImpresionsPhoto.url" class="detail-show-role-impression-photo-wrapper">
+                  <img
+                    class="detail-show-role-impression-photo-image"
+                    :src="roleImpresionsPhoto.url"
+                    :alt="roleImpression.role"
+                  >
+                  <input type="button" class="detail-show-photo-button" @click="openModal_photo(roleImpresionsPhoto.url)">
+                </figure>
+              </div>              
             </div>
           </div>
         </div>
@@ -271,10 +273,6 @@ export default {
       rentFlag: 0,   
       // エラー
       errors: {
-        photo: {
-          roleImpression: null,
-          pres: null
-        },
         error: null,
       },
       
@@ -382,19 +380,25 @@ export default {
       this.DVD.costumers.sort((a, b) => a.order - b.order );
       this.DVD.roles.sort((a, b) => a.order - b.order );
       this.DVD.roleImpressionList.sort((a, b) => a.order - b.order);
+      this.DVD.roleImpressionList.forEach(roleImpression => {
+        if(roleImpression.photos) {
+          roleImpression.photos.sort((a, b) => a.order - b.order);
+        }
+      });
       this.DVD.role_groups.sort((a, b) => a.order - b.order);
       this.DVD.songs.sort((a, b) => a.order - b.order);
       this.DVD.songs.forEach((song) => {
         song.singers.sort((a, b) => a.order - b.order);
       });
       this.DVD.others.sort((a, b) => a.order - b.order);
+      this.DVD.photos.sort((a, b) => a.order - b.order);
 
       this.originalDVD = JSON.parse(JSON.stringify(this.DVD));
       if(this.originalDVD.rents) {
         this.rentFlag = this.DVD.rents.find(rent => rent.flag == 1);
       }
 
-      this,this.showAreaResize();
+      this.showAreaResize();
     },
 
     // 描写後

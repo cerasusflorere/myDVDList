@@ -32,7 +32,7 @@ class DVDController extends BaseController
      */
     public function index()
     {
-        $DVDs = DVD_list::with(['locations','costumers', 'roles','photos','rents'=> function($query) {
+        $DVDs = DVD_list::where('official', 1)->with(['locations','costumers', 'roles','photos','rents'=> function($query) {
             $query->where('flag', 1);
         }])->orderByRaw('duration_from is null asc')->orderBy('duration_from')->get();
         return $DVDs;
@@ -129,7 +129,7 @@ class DVDController extends BaseController
     public function rent()
     {
         $DVD = DVD_list::with(['rents' => function($query) {
-            $query->where('flag', 1)->max('start_date');
+            $query->where(['flag', 1], ['official', 1])->max('start_date');
         }])->get(['id', 'title', 'duration_from']);
 
         return $DVD ?? abort(404);
