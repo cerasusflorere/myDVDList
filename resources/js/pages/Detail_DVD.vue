@@ -15,12 +15,18 @@
           </div>
 
           <div class="detail-show-info-block">
-            <div class="detail-show-info-header">媒体:</div>
-            <div class="detail-show-info-header" v-if="DVD.format == 1">DVD</div>
-            <div class="detail-show-info-header" v-else>Bluray</div>
+            <div class="detail-show-info-header">公式:</div>
+            <div class="detail-show-info-header" v-if="DVD.official"><i class="fas fa-check fa-fw"></i></div>
+            <div class="detail-show-info-header" v-else><i class="fas fa-times"></i></div>
           </div>
 
-          <div class="detail-show-info-block">
+          <div class="detail-show-info-block" v-if="DVD.official && DVD.format">
+            <div class="detail-show-info-header">媒体:</div>
+            <div class="detail-show-info-header" v-if="DVD.format == 1">DVD</div>
+            <div class="detail-show-info-header" v-else-if="DVD.format == 2">Bluray</div>
+          </div>
+
+          <div class="detail-show-info-block" v-if="DVD.official">
             <div class="detail-show-info-header">特典:</div>
             <div class="detail-show-info-header" v-if="DVD.special"><i class="fas fa-check fa-fw"></i></div>
             <div class="detail-show-info-header" v-else><i class="fas fa-times"></i></div>
@@ -138,7 +144,7 @@
       <div class="detail-show-roles-area detail-show-other-flex" v-if="DVD.roles.length">
         <div class="detail-show-header">配役</div>
         <div class="detail-show-roles-block detail-show-other-width">
-          <div class="detail-show-role-area" v-for="role in DVD.roles">
+          <div ref="detail_show_role_areas" class="detail-show-role-area" v-for="role in DVD.roles">
             <div class="detail-show-role-role" v-if="role.role">{{ role.role }}:</div>
             <div class="detail-show-role-role" v-else></div>
             <div class="detail-show-role-content" v-if="role.player">{{ role.player }}</div>
@@ -410,6 +416,17 @@ export default {
           mainRem = this.convertRem2Px(2) * 2;
         } else {
           mainRem = this.convertRem2Px(4) * 2;
+        }
+
+        
+        // 配役
+        if(this.$refs.detail_show_role_areas) {
+          this.$refs.detail_show_role_areas.forEach(area => {
+            if(area.clientHeight > 24) {
+              area.classList.add('detail-show-role-area-column-1');
+              area.children[1].classList.add('detail-show-role-content-column-2');
+            }
+          });
         }
 
         // 役感想
