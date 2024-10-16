@@ -15,12 +15,18 @@
           </div>
 
           <div class="detail-show-info-block">
-            <div class="detail-show-info-header">媒体:</div>
-            <div class="detail-show-info-header" v-if="DVD.format == 1">DVD</div>
-            <div class="detail-show-info-header" v-else>Bluray</div>
+            <div class="detail-show-info-header">公式:</div>
+            <div class="detail-show-info-header" v-if="DVD.official"><i class="fas fa-check fa-fw"></i></div>
+            <div class="detail-show-info-header" v-else><i class="fas fa-times"></i></div>
           </div>
 
-          <div class="detail-show-info-block">
+          <div class="detail-show-info-block" v-if="DVD.official && DVD.format">
+            <div class="detail-show-info-header">媒体:</div>
+            <div class="detail-show-info-header" v-if="DVD.format == 1">DVD</div>
+            <div class="detail-show-info-header" v-else-if="DVD.format == 2">Bluray</div>
+          </div>
+
+          <div class="detail-show-info-block" v-if="DVD.official">
             <div class="detail-show-info-header">特典:</div>
             <div class="detail-show-info-header" v-if="DVD.special"><i class="fas fa-check fa-fw"></i></div>
             <div class="detail-show-info-header" v-else><i class="fas fa-times"></i></div>

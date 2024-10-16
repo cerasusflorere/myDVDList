@@ -32,9 +32,10 @@ class DVDController extends BaseController
      */
     public function index()
     {
-        $DVDs = DVD_list::where('official', 1)->with(['locations','costumers', 'roles','photos','rents'=> function($query) {
-            $query->where('flag', 1);
-        }])->orderByRaw('duration_from is null asc')->orderBy('duration_from')->get();
+        $DVDs = DVD_list::where('own', 1)->where('adaptation', 1)
+                ->with(['locations','costumers', 'roles','photos','rents'=> function($query) {
+                    $query->where('flag', 1);
+                }])->orderByRaw('duration_from is null asc')->orderBy('duration_from')->get();
         return $DVDs;
     }
 
